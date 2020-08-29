@@ -23,6 +23,10 @@ func New() (*Tracker, error) {
 	t := &Tracker{
 		watcher,
 	}
+
+	go func() {
+		t.start()
+	}()
 	return t, nil
 }
 
@@ -38,34 +42,7 @@ func (t *Tracker) Track(file string) error {
 	return nil
 }
 
-func track() {
-	// defer watcher.Close()
-
-	// done := make(chan bool)
-	// go func() {
-	// 	for {
-	// 		select {
-	// 		case event, ok := <-watcher.Events:
-	// 			if !ok {
-	// 				return
-	// 			}
-	// 			log.Println("event:", event)
-	// 			if event.Op&fsnotify.Write == fsnotify.Write {
-	// 				log.Println("modified file:", event.Name)
-	// 			}
-	// 		case err, ok := <-watcher.Errors:
-	// 			if !ok {
-	// 				return
-	// 			}
-	// 			log.Println("error:", err)
-	// 		}
-	// 	}
-	// }()
-
-	// <-done
-}
-
-func sync(remote string, path string) {
+func (t *Tracker) sync(remote string, path string) {
 	args := strings.Split(fmt.Sprintf("rsync -a %s %s", path, remote), " ")
 	log.Println(args)
 	command := exec.Command(args[0], args[1:]...)
@@ -81,4 +58,25 @@ func sync(remote string, path string) {
 	log.Println(string(errput))
 	fmt.Println(string(output))
 	return
+}
+
+func (t *Tracker) start() {
+	for {
+		select {
+		case event, ok := <-t.watcher.Events:
+			if !ok {
+				continue
+			}
+			log.Println("event:", event)
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				log.Println("modified file:", event.Name)
+				t.sync("root@172.16.8.223:/root/ArshiA", event.Name)
+			}
+		case err, ok := <-t.watcher.Errors:
+			if !ok {
+				continue
+			}
+			log.Println("error:", err)
+		}
+	}
 }
