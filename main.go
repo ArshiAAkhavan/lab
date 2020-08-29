@@ -5,6 +5,11 @@ import (
 	"lab/internal/remote"
 )
 
+/*
+ * todo:
+ * add ssh open shell to remotes
+ */
+
 func main() {
 
 	l, _ := lab.New()
