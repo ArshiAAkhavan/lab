@@ -26,6 +26,11 @@ func (l *Lab) AddRemote(r remote.Remote) {
 	l.remotes = append(l.remotes, r)
 }
 
-func (l *lab) RemoveRemote(remoteName string) {
-	for _,r := l.remotes
+func (l *Lab) RemoveRemote(remoteName string) {
+	for i, r := range l.remotes {
+		if r.Name == remoteName {
+			l.remotes = append(l.remotes[:i], l.remotes[i+1:]...)
+			return
+		}
+	}
 }

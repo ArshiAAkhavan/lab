@@ -9,7 +9,7 @@ type Remote struct {
 	host string
 	path string
 
-	name string
+	Name string
 }
 
 func New(name, user, host, path string) *Remote {
