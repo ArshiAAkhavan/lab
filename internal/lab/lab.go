@@ -9,6 +9,7 @@ import (
  *	todo list:
  *	exclude path
  *
+ *	save tracking path to sync new labs
  */
 
 type Lab struct {
@@ -43,4 +44,18 @@ func (l *Lab) RemoveRemote(remoteName string) {
 
 func (l *Lab) Track(path string) {
 	l.tracker.Track(path)
+}
+
+func (l *Lab) Start() {
+	events := l.tracker.Start()
+	go func() {
+		for {
+			select {
+			case event := <-events:
+				for _, r := range l.remotes {
+					r.Sync(event.Name)
+				}
+			}
+		}
+	}()
 }

@@ -1,11 +1,7 @@
 package tracker
 
 import (
-	"fmt"
-	"io/ioutil"
 	"log"
-	"os/exec"
-	"strings"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -23,10 +19,6 @@ func New() (*Tracker, error) {
 	t := &Tracker{
 		watcher,
 	}
-
-	go func() {
-		t.start()
-	}()
 	return t, nil
 }
 
@@ -42,26 +34,7 @@ func (t *Tracker) Track(file string) error {
 	return nil
 }
 
-func (t *Tracker) sync(remote string, path string) {
-	//todo delete still not working
-	args := strings.Split(fmt.Sprintf("rsync -a --delete %s %s", path, remote), " ")
-	log.Println(args)
-	command := exec.Command(args[0], args[1:]...)
-	outStream, _ := command.StdoutPipe()
-	errStream, _ := command.StderrPipe()
-
-	command.Start()
-
-	output, _ := ioutil.ReadAll(outStream)
-	errput, _ := ioutil.ReadAll(errStream)
-
-	command.Wait()
-	log.Println(string(errput))
-	fmt.Println(string(output))
-	return
-}
-
-func (t *Tracker) start() {
+func (t *Tracker) start(events chan<- fsnotify.Event) {
 	for {
 		select {
 		case event, ok := <-t.watcher.Events:
@@ -71,7 +44,8 @@ func (t *Tracker) start() {
 			log.Println("event:", event)
 			if event.Op != 0 /*&fsnotify.Write == fsnotify.Write*/ {
 				log.Println("modified file:", event.Name)
-				t.sync("root@172.16.8.223:/root/ArshiA", event.Name)
+				events <- event
+				// t.sync("root@172.16.8.223:/root/ArshiA", event.Name)
 			}
 		case err, ok := <-t.watcher.Errors:
 			if !ok {
@@ -80,4 +54,12 @@ func (t *Tracker) start() {
 			log.Println("error:", err)
 		}
 	}
+}
+
+func (t *Tracker) Start() <-chan fsnotify.Event {
+	events := make(chan fsnotify.Event)
+	go func() {
+		t.start(events)
+	}()
+	return events
 }

@@ -2,6 +2,10 @@ package remote
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os/exec"
+	"strings"
 )
 
 type Remote struct {
@@ -18,6 +22,26 @@ func New(name, user, host, path string) *Remote {
 	}
 }
 
-func (l *Remote) Address() string {
-	return fmt.Sprintf("%s@%s:%s", l.user, l.host, l.path)
+func (r *Remote) address() string {
+	return fmt.Sprintf("%s@%s:%s", r.user, r.host, r.path)
+}
+
+func (r *Remote) Sync(file string) {
+	//todo delete still not working
+	args := strings.Split(fmt.Sprintf("rsync -a --delete %s %s", file, r.address()), " ")
+	log.Println(args)
+	command := exec.Command(args[0], args[1:]...)
+	outStream, _ := command.StdoutPipe()
+	errStream, _ := command.StderrPipe()
+
+	command.Start()
+
+	output, _ := ioutil.ReadAll(outStream)
+	errput, _ := ioutil.ReadAll(errStream)
+
+	command.Wait()
+	log.Println(string(errput))
+	fmt.Println(string(output))
+	return
+
 }
