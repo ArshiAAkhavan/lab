@@ -5,6 +5,12 @@ import (
 	"lab/internal/tracker"
 )
 
+/*
+ *	todo list:
+ *	exclude path
+ *
+ */
+
 type Lab struct {
 	tracker *tracker.Tracker
 	remotes []remote.Remote
@@ -33,4 +39,8 @@ func (l *Lab) RemoveRemote(remoteName string) {
 			return
 		}
 	}
+}
+
+func (l *Lab) Track(path string) {
+	l.tracker.Track(path)
 }
