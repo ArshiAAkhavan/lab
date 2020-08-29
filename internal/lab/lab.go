@@ -14,7 +14,7 @@ import (
 
 type Lab struct {
 	tracker *tracker.Tracker
-	remotes []remote.Remote
+	remotes []*remote.Remote
 }
 
 func New() (*Lab, error) {
@@ -24,12 +24,12 @@ func New() (*Lab, error) {
 	}
 	l := Lab{
 		tracker,
-		make([]remote.Remote, 0),
+		make([]*remote.Remote, 0),
 	}
 	return &l, err
 }
 
-func (l *Lab) AddRemote(r remote.Remote) {
+func (l *Lab) AddRemote(r *remote.Remote) {
 	l.remotes = append(l.remotes, r)
 }
 
