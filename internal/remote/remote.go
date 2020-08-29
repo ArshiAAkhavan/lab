@@ -8,14 +8,16 @@ type Remote struct {
 	user string
 	host string
 	path string
+
+	name string
 }
 
-func New(user, host, path string) *Remote {
+func New(name, user, host, path string) *Remote {
 	return &Remote{
-		user, host, path,
+		user, host, path, name,
 	}
 }
 
-func (l *Remote) Adress() string {
+func (l *Remote) Address() string {
 	return fmt.Sprintf("%s@%s:%s", l.user, l.host, l.path)
 }
