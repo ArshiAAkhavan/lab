@@ -1,21 +1,21 @@
-package lab
+package remote
 
 import (
 	"fmt"
 )
 
-type Lab struct {
+type Remote struct {
 	user string
 	host string
 	path string
 }
 
-func New(user, host, path string) *Lab {
-	return &Lab{
+func New(user, host, path string) *Remote {
+	return &Remote{
 		user, host, path,
 	}
 }
 
-func (l *Lab) Adress() string {
+func (l *Remote) Adress() string {
 	return fmt.Sprintf("%s@%s:%s", l.user, l.host, l.path)
 }
