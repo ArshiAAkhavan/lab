@@ -26,7 +26,11 @@ func New() (*Tracker, error) {
 	return t, nil
 }
 
-func (t *Tracker) track(file string) error {
+func (t *Tracker) Close() {
+	t.watcher.Close()
+}
+
+func (t *Tracker) Track(file string) error {
 	err := t.watcher.Add(file)
 	if err != nil {
 		return err
