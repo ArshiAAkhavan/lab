@@ -43,7 +43,7 @@ func (t *Tracker) Track(file string) error {
 }
 
 func (t *Tracker) sync(remote string, path string) {
-	args := strings.Split(fmt.Sprintf("rsync -a %s %s", path, remote), " ")
+	args := strings.Split(fmt.Sprintf("rsync -a --delete %s %s", path, remote), " ")
 	log.Println(args)
 	command := exec.Command(args[0], args[1:]...)
 	outStream, _ := command.StdoutPipe()
