@@ -3,6 +3,7 @@ package lab
 import (
 	"lab/internal/remote"
 	"lab/internal/tracker"
+	"sync"
 )
 
 /*
@@ -48,12 +49,17 @@ func (l *Lab) Track(path string) {
 
 func (l *Lab) Start() {
 	events := l.tracker.Start()
+	var wg sync.WaitGroup
 	go func() {
 		for {
 			select {
 			case event := <-events:
 				for _, r := range l.remotes {
-					r.Sync(event.Name)
+					wg.Add(1)
+					go func() {
+						r.Sync(event.Name)
+						wg.Done()
+					}()
 				}
 			}
 		}
