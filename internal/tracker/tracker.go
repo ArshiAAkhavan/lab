@@ -68,7 +68,7 @@ func (t *Tracker) start() {
 				continue
 			}
 			log.Println("event:", event)
-			if event.Op&fsnotify.Write == fsnotify.Write {
+			if event.Op != 0 /*&fsnotify.Write == fsnotify.Write*/ {
 				log.Println("modified file:", event.Name)
 				t.sync("root@172.16.8.223:/root/ArshiA", event.Name)
 			}

@@ -15,6 +15,7 @@ func main() {
 	}
 	tracker.Track("./a.txt")
 	tracker.Track("./ali.txt")
+
 	wg.Add(1)
 	wg.Wait()
 }
