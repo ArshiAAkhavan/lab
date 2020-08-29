@@ -43,6 +43,7 @@ func (t *Tracker) Track(file string) error {
 }
 
 func (t *Tracker) sync(remote string, path string) {
+	//todo delete still not working
 	args := strings.Split(fmt.Sprintf("rsync -a --delete %s %s", path, remote), " ")
 	log.Println(args)
 	command := exec.Command(args[0], args[1:]...)

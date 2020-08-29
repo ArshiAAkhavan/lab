@@ -13,8 +13,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tracker.Track("./a.txt")
-	tracker.Track("./ali.txt")
+	// tracker.Track("./a.txt")
+	tracker.Track("./")
 
 	wg.Add(1)
 	wg.Wait()
