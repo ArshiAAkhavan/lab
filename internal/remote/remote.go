@@ -14,16 +14,26 @@ type Remote struct {
 	path string
 
 	Name string
+
+	syncMode bool
 }
 
 func New(name, user, host, path string) *Remote {
 	return &Remote{
-		user, host, path, name,
+		user,
+		host,
+		path,
+		name,
+		false,
 	}
 }
 
 func (r *Remote) address() string {
 	return fmt.Sprintf("%s@%s:%s", r.user, r.host, r.path)
+}
+
+func (r *Remote) SetSyncMode(syncMode bool) {
+	r.syncMode = syncMode
 }
 
 func (r *Remote) Sync(file string) {
@@ -43,5 +53,4 @@ func (r *Remote) Sync(file string) {
 	log.Println(string(errput))
 	fmt.Println(string(output))
 	return
-
 }

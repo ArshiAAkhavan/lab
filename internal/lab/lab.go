@@ -30,6 +30,15 @@ func New() (*Lab, error) {
 	return &l, err
 }
 
+func (l *Lab) getRemoteByName(name string) *remote.Remote {
+	for _, r := range l.remotes {
+		if r.Name == name {
+			return r
+		}
+	}
+	return nil
+}
+
 func (l *Lab) AddRemote(r *remote.Remote) {
 	l.remotes = append(l.remotes, r)
 }
@@ -43,8 +52,33 @@ func (l *Lab) RemoveRemote(remoteName string) {
 	}
 }
 
+func (l *Lab) AllowSync(remoteName string) {
+	r := l.getRemoteByName(remoteName)
+	r.SetSyncMode(true)
+	l.syncAll(r)
+}
+
+func (l *Lab) DisableSync(remoteName string) {
+	l.getRemoteByName(remoteName).SetSyncMode(false)
+}
+
 func (l *Lab) Track(path string) {
 	l.tracker.Track(path)
+}
+
+func (l *Lab) syncFile(r *remote.Remote, file string, wg *sync.WaitGroup) {
+	wg.Add(1)
+	go func() {
+		r.Sync(file)
+		wg.Done()
+	}()
+}
+
+func (l *Lab) syncAll(r *remote.Remote) {
+	var wg sync.WaitGroup
+	for _, p := range l.tracker.Paths() {
+		l.syncFile(r, p, &wg)
+	}
 }
 
 func (l *Lab) Start() {
@@ -55,11 +89,7 @@ func (l *Lab) Start() {
 			select {
 			case event := <-events:
 				for _, r := range l.remotes {
-					wg.Add(1)
-					go func() {
-						r.Sync(event.Name)
-						wg.Done()
-					}()
+					l.syncFile(r, event.Name, &wg)
 				}
 			}
 		}
