@@ -8,6 +8,7 @@ import (
 
 type Tracker struct {
 	watcher *fsnotify.Watcher
+	paths   []string
 }
 
 func New() (*Tracker, error) {
@@ -17,7 +18,7 @@ func New() (*Tracker, error) {
 	}
 
 	t := &Tracker{
-		watcher,
+		watcher, make([]string, 0),
 	}
 	return t, nil
 }
@@ -26,11 +27,12 @@ func (t *Tracker) Close() {
 	t.watcher.Close()
 }
 
-func (t *Tracker) Track(file string) error {
-	err := t.watcher.Add(file)
+func (t *Tracker) Track(path string) error {
+	err := t.watcher.Add(path)
 	if err != nil {
 		return err
 	}
+	t.paths = append(t.paths, path)
 	return nil
 }
 
@@ -45,7 +47,6 @@ func (t *Tracker) start(events chan<- fsnotify.Event) {
 			if event.Op != 0 /*&fsnotify.Write == fsnotify.Write*/ {
 				log.Println("modified file:", event.Name)
 				events <- event
-				// t.sync("root@172.16.8.223:/root/ArshiA", event.Name)
 			}
 		case err, ok := <-t.watcher.Errors:
 			if !ok {
@@ -62,4 +63,8 @@ func (t *Tracker) Start() <-chan fsnotify.Event {
 		t.start(events)
 	}()
 	return events
+}
+
+func (t *Tracker) Paths() []string {
+	return t.paths
 }
