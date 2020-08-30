@@ -3,6 +3,7 @@ package main
 import (
 	"lab/internal/lab"
 	"lab/internal/remote"
+	"time"
 )
 
 /*
@@ -17,6 +18,9 @@ func main() {
 	l.AddRemote(remote.New("global-vm2", "root", "172.16.8.223", "/root/ArshiA2"))
 	l.Track("./")
 	l.Start()
+	l.AllowSync("global-vm")
+	time.Sleep(time.Second * 10)
+	l.AllowSync("global-vm2")
 
 	wait := make(chan bool)
 	<-wait
