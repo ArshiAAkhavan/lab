@@ -95,3 +95,7 @@ func (l *Lab) Start() {
 		}
 	}()
 }
+
+func (l *Lab) GetAllRemote() []*remote.Remote {
+	return l.remotes
+}
